@@ -8,7 +8,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         const enableDebugLogging = config.get('ENABLE_DATABASE_DEBUG_LOGGING');
 
         super({
-            log: enableDebugLogging ? ['query', 'info', 'warn', 'error'] : ['warn', 'error'],
+            log: enableDebugLogging ? ['query', 'info', 'warn', 'error'] : ['warn', 'error']
         });
     }
 

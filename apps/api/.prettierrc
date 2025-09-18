@@ -1,8 +1,11 @@
 {
+    "parser": "typescript",
+    "printWidth": 120,
     "singleQuote": true,
-    "trailingComma": "all",
+    "trailingComma": "none",
     "useTabs": false,
     "tabWidth": 4,
+    "arrowParens": "avoid",
     "importOrder": [
         "<THIRD_PARTY_MODULES>",
         "^@api/(.*)$",
