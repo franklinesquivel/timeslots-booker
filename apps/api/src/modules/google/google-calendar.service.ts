@@ -1,61 +1,20 @@
-import { auth, calendar, calendar_v3 } from '@googleapis/calendar';
+import { calendar, calendar_v3 } from '@googleapis/calendar';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoogleToken } from '@prisma/client';
 import { GaxiosError } from 'gaxios';
-import { OAuth2Client } from 'google-auth-library';
 import { getMessageFromUnknownError } from '@api/common/utils';
-import { TypedConfigService } from '@api/config/typed-config.service';
-import { PrismaService } from '@api/prisma/prisma.service';
+import { GoogleAuthService } from './google-auth.service';
 
 type UserCalendarIdObjType = { id: string };
 
 @Injectable()
 export class GoogleCalendarService {
-    constructor(
-        private readonly prisma: PrismaService,
-        private readonly configService: TypedConfigService
-    ) {}
-
-    private getOauthClient(): OAuth2Client {
-        return new auth.OAuth2(
-            this.configService.get('GOOGLE_CLIENT_ID'),
-            this.configService.get('GOOGLE_CLIENT_SECRET')
-        );
-    }
+    constructor(private readonly authService: GoogleAuthService) {}
 
     private getCalendarClient(userToken: GoogleToken): calendar_v3.Calendar {
-        const authClient = this.getOauthClient();
-
-        authClient.setCredentials({
-            access_token: userToken.accessToken,
-            refresh_token: userToken.refreshToken
-        });
+        const authClient = this.authService.getOAuthClient(userToken);
 
         return calendar({ version: 'v3', auth: authClient });
-    }
-
-    private async refreshAccessToken(token: GoogleToken): Promise<GoogleToken> {
-        const authClient = this.getOauthClient();
-        authClient.setCredentials({ refresh_token: token.refreshToken });
-
-        try {
-            const { token: newAccessToken, res } = await authClient.getAccessToken();
-
-            if (!newAccessToken) {
-                console.error('Error refreshing access token', { response: res?.json() });
-                throw new InternalServerErrorException('Failed to refresh access token: invalid response body');
-            }
-
-            return this.prisma.googleToken.update({
-                where: { id: token.id },
-                data: { accessToken: newAccessToken }
-            });
-        } catch (error: unknown) {
-            const errMsg = getMessageFromUnknownError(error);
-
-            console.error('Error refreshing access token', { error: errMsg });
-            throw new InternalServerErrorException(`Failed to refresh Google Access Token: ${errMsg}`);
-        }
     }
 
     private async handleApiError<T>(
@@ -66,7 +25,7 @@ export class GoogleCalendarService {
         if (error instanceof GaxiosError && error.response?.status === 401) {
             console.log('Access token expired, refreshing...');
 
-            const refreshedToken = await this.refreshAccessToken(userToken);
+            const refreshedToken = await this.authService.refreshAccessToken(userToken);
             return apiCall(refreshedToken);
         }
 
