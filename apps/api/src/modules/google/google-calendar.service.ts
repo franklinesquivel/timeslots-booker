@@ -3,6 +3,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoogleToken } from '@prisma/client';
 import { GaxiosError } from 'gaxios';
 import { OAuth2Client } from 'google-auth-library';
+import { getMessageFromUnknownError } from '@api/common/utils';
 import { TypedConfigService } from '@api/config/typed-config.service';
 import { PrismaService } from '@api/prisma/prisma.service';
 
@@ -38,19 +39,22 @@ export class GoogleCalendarService {
         authClient.setCredentials({ refresh_token: token.refreshToken });
 
         try {
-            const { token: newAccessToken } = await authClient.getAccessToken();
+            const { token: newAccessToken, res } = await authClient.getAccessToken();
 
             if (!newAccessToken) {
-                throw new InternalServerErrorException('Failed to refresh access token');
+                console.error('Error refreshing access token', { response: res?.json() });
+                throw new InternalServerErrorException('Failed to refresh access token: invalid response body');
             }
 
             return this.prisma.googleToken.update({
                 where: { id: token.id },
                 data: { accessToken: newAccessToken }
             });
-        } catch (error) {
-            console.error('Error refreshing access token:', error);
-            throw new InternalServerErrorException('Failed to refresh access token');
+        } catch (error: unknown) {
+            const errMsg = getMessageFromUnknownError(error);
+
+            console.error('Error refreshing access token', { error: errMsg });
+            throw new InternalServerErrorException(`Failed to refresh Google Access Token: ${errMsg}`);
         }
     }
 
@@ -61,10 +65,12 @@ export class GoogleCalendarService {
     ): Promise<T> {
         if (error instanceof GaxiosError && error.response?.status === 401) {
             console.log('Access token expired, refreshing...');
+
             const refreshedToken = await this.refreshAccessToken(userToken);
             return apiCall(refreshedToken);
         }
-        console.error('An unexpected error occurred:', error);
+
+        console.error('An unexpected error occurred', { error: getMessageFromUnknownError(error) });
         throw error;
     }
 
@@ -104,7 +110,8 @@ export class GoogleCalendarService {
                 }
             });
 
-            if (!response.data.calendars) throw new InternalServerErrorException('Invalid calendar response');
+            if (!response.data.calendars)
+                throw new InternalServerErrorException('Invalid calendar: No data in user calendars response');
 
             const busyInSomeCalendar = Object.entries(response.data.calendars).some(
                 ([, c]) => c.busy && c.busy.length > 0
