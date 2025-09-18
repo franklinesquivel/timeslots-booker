@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  googleId    String       @unique
-  email       String       @unique
-  name        String
-  picture     String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  googleToken GoogleToken?
+  id                          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  googleId                    String       @unique
+  email                       String       @unique
+  name                        String
+  picture                     String?
+  allowedGoogleCalendarAccess Boolean      @default(false)
+  createdAt                   DateTime     @default(now())
+  updatedAt                   DateTime     @updatedAt
+  googleToken                 GoogleToken?
 
   @@map("users")
 }
