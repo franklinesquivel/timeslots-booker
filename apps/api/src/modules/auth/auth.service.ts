@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { User } from '@prisma/client';
+import { googleCalendarScopes } from '@api/common/constants/google-calendar-scopes';
+import { GoogleAuthService } from '@api/modules/google/google-auth.service';
 import { PrismaService } from '@api/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly prisma: PrismaService,
-        private readonly jwtService: JwtService
+        private readonly googleAuthService: GoogleAuthService,
+        private readonly jwtService: JwtService,
+        private readonly prisma: PrismaService
     ) {}
 
     async validateUser(details: {
@@ -18,8 +21,15 @@ export class AuthService {
         accessToken: string;
         refreshToken: string;
     }): Promise<User> {
-        const user = await this.prisma.user.findUnique({
-            where: { googleId: details.googleId }
+        const user = await this.prisma.user.upsert({
+            where: { googleId: details.googleId },
+            update: {},
+            create: {
+                googleId: details.googleId,
+                email: details.email,
+                name: details.name,
+                picture: details.picture
+            }
         });
 
         /**
@@ -28,36 +38,39 @@ export class AuthService {
          */
         const expiryDate = new Date(Date.now() + 3600 * 1000);
 
-        const googleToken = {
+        const googleTokenData = {
             accessToken: details.accessToken,
             refreshToken: details.refreshToken,
-            expiryDate
+            expiryDate,
+            userId: user.id
         };
 
-        if (user) {
-            return this.prisma.user.update({
-                where: { id: user.id },
-                data: {
-                    googleToken: {
-                        upsert: {
-                            create: googleToken,
-                            update: googleToken
-                        }
-                    }
-                }
-            });
-        }
+        const googleToken = await this.prisma.googleToken.upsert({
+            where: { userId: user.id },
+            create: googleTokenData,
+            update: googleTokenData
+        });
 
-        return this.prisma.user.create({
-            data: {
-                googleId: details.googleId,
-                email: details.email,
-                name: details.name,
-                picture: details.picture,
-                googleToken: {
-                    create: googleToken
-                }
-            }
+        const tokenScopes = await this.googleAuthService.getUserScopes(googleToken);
+
+        const calendarScopesAreEnabled = googleCalendarScopes.every(requiredScope =>
+            tokenScopes.includes(requiredScope)
+        );
+
+        /**
+         * If the required scopes are not enabled (not present in the access token data) AND the current user data
+         * has `false` in the calendar_access_flag column, we don't need to do anything
+         */
+        if (!calendarScopesAreEnabled && !user.allowedGoogleCalendarAccess) return user;
+
+        /**
+         * Synchronizes the user's access flag with the token's scopes.
+         * This ensures the `allowedGoogleCalendarAccess` flag in the database
+         * accurately reflects the permissions granted by the user.
+         */
+        return await this.prisma.user.update({
+            where: { id: user.id },
+            data: { allowedGoogleCalendarAccess: calendarScopesAreEnabled }
         });
     }
 

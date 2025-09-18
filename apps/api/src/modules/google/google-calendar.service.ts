@@ -1,8 +1,6 @@
 import { calendar, calendar_v3 } from '@googleapis/calendar';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoogleToken } from '@prisma/client';
-import { GaxiosError } from 'gaxios';
-import { getMessageFromUnknownError } from '@api/common/utils';
 import { GoogleAuthService } from './google-auth.service';
 
 type UserCalendarIdObjType = { id: string };
@@ -12,25 +10,9 @@ export class GoogleCalendarService {
     constructor(private readonly authService: GoogleAuthService) {}
 
     private getCalendarClient(userToken: GoogleToken): calendar_v3.Calendar {
-        const authClient = this.authService.getOAuthClient(userToken.refreshToken, userToken.accessToken);
+        const authClient = this.authService.getOAuthClient(userToken);
 
         return calendar({ version: 'v3', auth: authClient });
-    }
-
-    private async handleApiError<T>(
-        error: unknown,
-        userToken: GoogleToken,
-        apiCall: (refreshedToken: GoogleToken) => Promise<T>
-    ): Promise<T> {
-        if (error instanceof GaxiosError && error.response?.status === 401) {
-            console.log('Access token expired, refreshing...');
-
-            const refreshedToken = await this.authService.refreshAccessToken(userToken);
-            return apiCall(refreshedToken);
-        }
-
-        console.error('An unexpected error occurred', { error: getMessageFromUnknownError(error) });
-        throw error;
     }
 
     private async getUserCalendarsIds(userToken: GoogleToken): Promise<UserCalendarIdObjType[]> {
@@ -48,7 +30,9 @@ export class GoogleCalendarService {
         try {
             return await execute(userToken);
         } catch (error) {
-            return this.handleApiError(error, userToken, refreshedToken => execute(refreshedToken));
+            return this.authService.retryApiOperationAfterTokenRefresh(error, userToken, refreshedToken =>
+                execute(refreshedToken)
+            );
         }
     }
 
@@ -82,7 +66,9 @@ export class GoogleCalendarService {
         try {
             return await execute(userToken);
         } catch (error) {
-            return this.handleApiError(error, userToken, refreshedToken => execute(refreshedToken));
+            return this.authService.retryApiOperationAfterTokenRefresh(error, userToken, refreshedToken =>
+                execute(refreshedToken)
+            );
         }
     }
 }
