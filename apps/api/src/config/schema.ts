@@ -9,6 +9,7 @@ export const schema = z.object({
     GOOGLE_CALLBACK_URL: z.url(),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+    JWT_SECRET: z.string(),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     PORT: z.coerce.number().default(3000)
 });

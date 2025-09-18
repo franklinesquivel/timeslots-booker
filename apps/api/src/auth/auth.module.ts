@@ -1,12 +1,24 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { TypedConfigService } from '../config/typed-config.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './google.strategy';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
-    imports: [PrismaModule],
+    imports: [
+        PrismaModule,
+        JwtModule.registerAsync({
+            inject: [TypedConfigService],
+            useFactory: (configService: TypedConfigService) => ({
+                secret: configService.get('JWT_SECRET'),
+                signOptions: { expiresIn: '1d' }
+            })
+        })
+    ],
     controllers: [AuthController],
-    providers: [AuthService, GoogleStrategy]
+    providers: [AuthService, GoogleStrategy, JwtStrategy]
 })
 export class AuthModule {}

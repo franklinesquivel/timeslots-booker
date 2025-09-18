@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+import type { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly jwtService: JwtService
+    ) {}
 
     async validateUser(details: {
         googleId: string;
@@ -61,5 +65,12 @@ export class AuthService {
                 }
             }
         });
+    }
+
+    login(user: User) {
+        const payload = { email: user.email, sub: user.id };
+        return {
+            accessToken: this.jwtService.sign(payload)
+        };
     }
 }
