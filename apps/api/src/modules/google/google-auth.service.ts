@@ -13,18 +13,18 @@ export class GoogleAuthService {
         private readonly configService: TypedConfigService
     ) {}
 
-    getOAuthClient(userToken: GoogleToken, refreshOnly = false): OAuth2Client {
+    getOAuthClient(refreshToken: string, accessToken?: string): OAuth2Client {
         const client = new auth.OAuth2(
             this.configService.get('GOOGLE_CLIENT_ID'),
             this.configService.get('GOOGLE_CLIENT_SECRET')
         );
 
         const credentials: Credentials = {
-            refresh_token: userToken.refreshToken
+            refresh_token: refreshToken
         };
 
-        if (!refreshOnly) {
-            credentials.access_token = userToken.accessToken;
+        if (accessToken) {
+            credentials.access_token = accessToken;
         }
 
         client.setCredentials(credentials);
@@ -33,7 +33,7 @@ export class GoogleAuthService {
     }
 
     async refreshAccessToken(userToken: GoogleToken): Promise<GoogleToken> {
-        const authClient = this.getOAuthClient(userToken, true);
+        const authClient = this.getOAuthClient(userToken.refreshToken);
 
         try {
             const { token: newAccessToken, res } = await authClient.getAccessToken();
@@ -55,11 +55,11 @@ export class GoogleAuthService {
         }
     }
 
-    async getUserScopes(userToken: GoogleToken): Promise<string[]> {
-        const authClient = this.getOAuthClient(userToken);
+    async getUserScopes(accessToken: string, refreshToken: string): Promise<string[]> {
+        const authClient = this.getOAuthClient(refreshToken, accessToken);
 
         try {
-            const { scopes } = await authClient.getTokenInfo(userToken.accessToken);
+            const { scopes } = await authClient.getTokenInfo(accessToken);
             return scopes;
         } catch (error: unknown) {
             const errMsg = getMessageFromUnknownError(error);

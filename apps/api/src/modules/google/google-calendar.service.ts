@@ -12,7 +12,7 @@ export class GoogleCalendarService {
     constructor(private readonly authService: GoogleAuthService) {}
 
     private getCalendarClient(userToken: GoogleToken): calendar_v3.Calendar {
-        const authClient = this.authService.getOAuthClient(userToken);
+        const authClient = this.authService.getOAuthClient(userToken.refreshToken, userToken.accessToken);
 
         return calendar({ version: 'v3', auth: authClient });
     }
