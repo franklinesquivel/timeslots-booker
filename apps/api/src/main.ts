@@ -10,8 +10,7 @@ async function bootstrap() {
 }
 
 bootstrap().catch(err => {
-    // Log the error to the console or a logging service
+    // Handle exception explicitly to avoid `unhandled promise` warning.
     console.error('Application failed to start:', err);
-    // Exit the process with a non-zero exit code to indicate failure
     process.exit(1);
 });

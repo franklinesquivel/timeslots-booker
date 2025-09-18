@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { TypedConfigService } from '../config/typed-config.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { TypedConfigService } from '@api/config/typed-config.service';
+import { PrismaModule } from '@api/prisma/prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './google.strategy';

@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { schema } from '@api/config/schema';
-import { TypedConfigModule } from '@api/config/typed-config.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { GoogleModule } from './google/google.module';
+import { schema } from './config/schema';
+import { TypedConfigModule } from './config/typed-config.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
+import { GoogleModule } from './modules/google/google.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -18,11 +17,10 @@ import { PrismaModule } from './prisma/prisma.module';
 
         AuthModule,
         GoogleModule,
+        CalendarModule,
         PassportModule.register({ session: false }), // stateless config - for api <-> client communication
         PrismaModule,
         TypedConfigModule
-    ],
-    controllers: [AppController],
-    providers: [AppService]
+    ]
 })
 export class AppModule {}

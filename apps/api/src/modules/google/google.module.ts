@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { TypedConfigModule } from '../config/typed-config.module';
-import { PrismaModule } from '../prisma/prisma.module';
+import { TypedConfigModule } from '@api/config/typed-config.module';
+import { PrismaModule } from '@api/prisma/prisma.module';
 import { GoogleCalendarService } from './google-calendar.service';
 
 @Module({

@@ -3,8 +3,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoogleToken } from '@prisma/client';
 import { GaxiosError } from 'gaxios';
 import { OAuth2Client } from 'google-auth-library';
-import { TypedConfigService } from '../config/typed-config.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { TypedConfigService } from '@api/config/typed-config.service';
+import { PrismaService } from '@api/prisma/prisma.service';
 
 type UserCalendarIdObjType = { id: string };
 
