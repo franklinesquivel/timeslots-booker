@@ -9,6 +9,9 @@
 .idea/**/dictionaries
 .idea/**/shelf
 
+# Selected Code Styles (We priorityze Prettier)
+/codeStyles/
+
 # AWS User-specific
 .idea/**/aws.xml
 
