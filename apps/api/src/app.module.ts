@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { TraceMiddleware } from './common/middleware/trace.middleware';
+import { TraceModule } from './common/trace/trace.module';
 import { schema } from './config/schema';
 import { TypedConfigModule } from './config/typed-config.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { CalendarModule } from './modules/calendar/calendar.module';
 import { GoogleModule } from './modules/google/google.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -17,10 +18,14 @@ import { PrismaModule } from './prisma/prisma.module';
 
         AuthModule,
         GoogleModule,
-        CalendarModule,
-        PassportModule.register({ session: false }), // stateless config - for api <-> client communication
+        PassportModule.register({ session: false }),
         PrismaModule,
+        TraceModule,
         TypedConfigModule
     ]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(TraceMiddleware).forRoutes('*');
+    }
+}
