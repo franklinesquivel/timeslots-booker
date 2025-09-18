@@ -28,22 +28,20 @@ export class AuthService {
          */
         const expiryDate = new Date(Date.now() + 3600 * 1000);
 
+        const googleToken = {
+            accessToken: details.accessToken,
+            refreshToken: details.refreshToken,
+            expiryDate
+        };
+
         if (user) {
             return this.prisma.user.update({
                 where: { id: user.id },
                 data: {
                     googleToken: {
                         upsert: {
-                            create: {
-                                accessToken: details.accessToken,
-                                refreshToken: details.refreshToken,
-                                expiryDate
-                            },
-                            update: {
-                                accessToken: details.accessToken,
-                                refreshToken: details.refreshToken,
-                                expiryDate
-                            }
+                            create: googleToken,
+                            update: googleToken
                         }
                     }
                 }
@@ -57,11 +55,7 @@ export class AuthService {
                 name: details.name,
                 picture: details.picture,
                 googleToken: {
-                    create: {
-                        accessToken: details.accessToken,
-                        refreshToken: details.refreshToken,
-                        expiryDate
-                    }
+                    create: googleToken
                 }
             }
         });
