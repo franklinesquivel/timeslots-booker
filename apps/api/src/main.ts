@@ -10,7 +10,15 @@ async function bootstrap() {
         AppModule,
         new FastifyAdapter(),
     );
+
+    app.enableShutdownHooks();
+
     await app.listen(process.env.PORT ?? 3000);
 }
 
-void bootstrap();
+bootstrap().catch((err) => {
+    // Log the error to the console or a logging service
+    console.error('Application failed to start:', err);
+    // Exit the process with a non-zero exit code to indicate failure
+    process.exit(1);
+});
