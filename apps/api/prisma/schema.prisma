@@ -4,6 +4,11 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+enum TimeSlotStatus {
+  ACTIVE
+  CANCELLED
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,6 +28,7 @@ model User {
   createdAt                   DateTime     @default(now())
   updatedAt                   DateTime     @updatedAt
   googleToken                 GoogleToken?
+  TimeSlot                    TimeSlot?
 
   @@map("users")
 }
@@ -36,4 +42,16 @@ model GoogleToken {
   userId       String   @unique @db.Uuid
 
   @@map("google_tokens")
+}
+
+model TimeSlot {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  startDateTime DateTime
+  endDateTime   DateTime
+  status        TimeSlotStatus @default(ACTIVE)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String         @unique @db.Uuid
+
+  @@map("time_slots")
 }
