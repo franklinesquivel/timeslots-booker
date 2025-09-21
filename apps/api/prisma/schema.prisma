@@ -4,11 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-enum TimeSlotStatus {
-  ACTIVE
-  CANCELLED
-}
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,16 +14,16 @@ datasource db {
 }
 
 model User {
-  id                          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  googleId                    String       @unique
-  email                       String       @unique
+  id                          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  googleId                    String            @unique
+  email                       String            @unique
   name                        String
   picture                     String?
-  allowedGoogleCalendarAccess Boolean      @default(false)
-  createdAt                   DateTime     @default(now())
-  updatedAt                   DateTime     @updatedAt
+  allowedGoogleCalendarAccess Boolean           @default(false)
+  createdAt                   DateTime          @default(now())
+  updatedAt                   DateTime          @updatedAt
   googleToken                 GoogleToken?
-  TimeSlot                    TimeSlot?
+  bookings                    TimeSlotBooking[]
 
   @@map("users")
 }
@@ -44,14 +39,19 @@ model GoogleToken {
   @@map("google_tokens")
 }
 
-model TimeSlot {
-  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+enum BookingStatus {
+  ACTIVE
+  CANCELLED
+}
+
+model TimeSlotBooking {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String
   startDateTime DateTime
   endDateTime   DateTime
-  status        TimeSlotStatus @default(ACTIVE)
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String         @unique @db.Uuid
+  status        BookingStatus @default(ACTIVE)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String        @unique @db.Uuid
 
-  @@map("time_slots")
+  @@map("time_slot_bookings")
 }
