@@ -51,7 +51,7 @@ model TimeSlotBooking {
   endDateTime   DateTime
   status        BookingStatus @default(ACTIVE)
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String        @unique @db.Uuid
+  userId        String        @db.Uuid
 
   @@map("time_slot_bookings")
 }
