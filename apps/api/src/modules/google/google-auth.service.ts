@@ -38,15 +38,20 @@ export class GoogleAuthService {
         userToken: GoogleToken,
         apiCall: (refreshedToken: GoogleToken) => Promise<T>
     ): Promise<T> {
-        if (error instanceof GaxiosError && error.response?.status === 401) {
-            console.log('Access token expired, refreshing...');
+        if (error instanceof GaxiosError) {
+            const res = error.response as GaxiosError<unknown>['response'];
 
-            const refreshedToken = await this.refreshAccessToken(userToken);
-            return apiCall(refreshedToken);
+            if (res?.status === 401) {
+                console.log('Access token expired, refreshing...');
+
+                const refreshedToken = await this.refreshAccessToken(userToken);
+                return apiCall(refreshedToken);
+            }
+
+            console.error('Error calling Google API', { error: res?.data });
         }
 
-        console.error('An unexpected error occurred', { error: getMessageFromUnknownError(error) });
-        throw error;
+        throw new InternalServerErrorException(`Error calling Google API: ${getMessageFromUnknownError(error)}`);
     }
 
     async refreshAccessToken(userToken: GoogleToken): Promise<GoogleToken> {

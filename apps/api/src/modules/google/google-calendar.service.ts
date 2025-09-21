@@ -1,18 +1,34 @@
 import { calendar, calendar_v3 } from '@googleapis/calendar';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { GoogleToken } from '@prisma/client';
+import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { GoogleToken, User } from '@prisma/client';
+import { PrismaService } from '@api/prisma/prisma.service';
 import { GoogleAuthService } from './google-auth.service';
 
 type UserCalendarIdObjType = { id: string };
 
 @Injectable()
 export class GoogleCalendarService {
-    constructor(private readonly authService: GoogleAuthService) {}
+    constructor(
+        private readonly authService: GoogleAuthService,
+        private readonly prisma: PrismaService
+    ) {}
 
     private getCalendarClient(userToken: GoogleToken): calendar_v3.Calendar {
         const authClient = this.authService.getOAuthClient(userToken);
 
         return calendar({ version: 'v3', auth: authClient });
+    }
+
+    private async getUserGoogleToken(userId: string): Promise<GoogleToken> {
+        const googleToken = await this.prisma.googleToken.findUnique({
+            where: { userId }
+        });
+
+        if (!googleToken) {
+            throw new ConflictException("The current user doesn't have an associated Google Access Token");
+        }
+
+        return googleToken;
     }
 
     private async getUserCalendarsIds(userToken: GoogleToken): Promise<UserCalendarIdObjType[]> {
@@ -36,14 +52,12 @@ export class GoogleCalendarService {
         }
     }
 
-    async checkUserCalendarsAvailabilityByTimeSlot(
-        userToken: GoogleToken,
-        startTime: string,
-        endTime: string
-    ): Promise<boolean> {
+    async checkUserCalendarsAvailabilityByTimeSlot(user: User, startTime: string, endTime: string): Promise<boolean> {
+        const googleToken = await this.getUserGoogleToken(user.id);
+
         const execute = async (currentToken: GoogleToken) => {
             const client = this.getCalendarClient(currentToken);
-            const userCalendarsIds = await this.getUserCalendarsIds(userToken);
+            const userCalendarsIds = await this.getUserCalendarsIds(currentToken);
 
             const response = await client.freebusy.query({
                 requestBody: {
@@ -64,9 +78,9 @@ export class GoogleCalendarService {
         };
 
         try {
-            return await execute(userToken);
+            return await execute(googleToken);
         } catch (error) {
-            return this.authService.retryApiOperationAfterTokenRefresh(error, userToken, refreshedToken =>
+            return this.authService.retryApiOperationAfterTokenRefresh(error, googleToken, refreshedToken =>
                 execute(refreshedToken)
             );
         }
