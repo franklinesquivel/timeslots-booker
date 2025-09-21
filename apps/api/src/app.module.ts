@@ -6,6 +6,7 @@ import { TraceModule } from './common/trace/trace.module';
 import { schema } from './config/schema';
 import { TypedConfigModule } from './config/typed-config.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 import { GoogleModule } from './modules/google/google.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -17,6 +18,7 @@ import { PrismaModule } from './prisma/prisma.module';
         }),
 
         AuthModule,
+        BookingsModule,
         GoogleModule,
         PassportModule.register({ session: false }),
         PrismaModule,
