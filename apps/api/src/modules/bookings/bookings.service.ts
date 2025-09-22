@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { BookingStatus, TimeSlotBooking, User } from '@prisma/client';
 import {
     GoogleCalendarConflictException,
@@ -77,20 +77,17 @@ export class BookingsService {
     }
 
     async cancelBooking(actor: User, bookingId: string): Promise<void> {
-        const result = await this.prismaService.timeSlotBooking.updateMany({
-            where: {
-                id: bookingId,
-                status: BookingStatus.ACTIVE, // Only active bookings
-                userId: actor.id // Check for ownership directly in the where clause
-            },
-            data: {
-                status: BookingStatus.CANCELLED
-            }
+        const booking = await this.prismaService.timeSlotBooking.findFirst({
+            where: { id: bookingId, status: BookingStatus.ACTIVE }
         });
 
-        // If no rows were updated, it means the booking was not found for this user.
-        if (result.count === 0) {
-            throw new NotFoundException("Booking not found or you don't have permission to cancel it.");
-        }
+        if (!booking) throw new NotFoundException("The selected booking doesn't exists or it's already cancelled");
+
+        if (booking.userId !== actor.id) throw new ForbiddenException('You are not allowed to cancel this booking');
+
+        await this.prismaService.timeSlotBooking.update({
+            where: { id: bookingId },
+            data: { status: BookingStatus.CANCELLED }
+        });
     }
 }
