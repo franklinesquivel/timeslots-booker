@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import reactPlugin from 'eslint-plugin-react';
@@ -25,6 +26,7 @@ export default defineConfig([
             reactRefresh.configs.vite,
 
             eslintPluginPrettierRecommended,
+            eslintConfigPrettier,
 
             reactPlugin.configs.flat.recommended,
             reactPlugin.configs.flat['jsx-runtime']
@@ -52,7 +54,7 @@ export default defineConfig([
                 }
             ],
             'react/jsx-boolean-value': 'error',
-            'react/jsx-newline': 'error',
+            'react/jsx-newline': 'off', // incompatible with prettier
             'react/jsx-no-useless-fragment': 'error',
             'react/jsx-pascal-case': [
                 'error',
