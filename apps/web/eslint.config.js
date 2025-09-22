@@ -43,7 +43,54 @@ export default defineConfig([
             }
         },
         rules: {
-            ...eslintPluginBetterTailwindcss.configs['recommended-error'].rules
+            ...eslintPluginBetterTailwindcss.configs['recommended-error'].rules,
+
+            'react-refresh/only-export-components': [
+                'warn',
+                {
+                    allowConstantExport: true
+                }
+            ],
+            'react/jsx-boolean-value': 'error',
+            'react/jsx-newline': 'error',
+            'react/jsx-no-useless-fragment': 'error',
+            'react/jsx-pascal-case': [
+                'error',
+                {
+                    allowAllCaps: false
+                }
+            ],
+            'react/jsx-sort-props': [
+                'warn',
+                {
+                    callbacksLast: true,
+                    multiline: 'last',
+                    shorthandFirst: true,
+                    reservedFirst: true
+                }
+            ],
+            'react/jsx-wrap-multilines': [
+                'warn',
+                {
+                    arrow: 'parens-new-line',
+                    assignment: 'parens-new-line',
+                    condition: 'parens-new-line',
+                    declaration: 'parens-new-line',
+                    logical: 'parens-new-line',
+                    prop: 'parens-new-line',
+                    return: 'parens-new-line'
+                }
+            ],
+            'react/prefer-read-only-props': 'warn',
+            'react/prop-types': 'off',
+            'react/react-in-jsx-scope': 'off',
+            'react/self-closing-comp': [
+                'error',
+                {
+                    component: true,
+                    html: true
+                }
+            ]
         },
         settings: {
             'better-tailwindcss': {

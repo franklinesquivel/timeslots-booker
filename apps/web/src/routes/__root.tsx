@@ -6,20 +6,24 @@ const RootLayout = () => (
     <>
         <div className="flex gap-2 p-2">
             <Link
-                to="/"
                 className="[&.active]:font-bold"
+                to="/"
             >
                 <Button>Home</Button>
             </Link>{' '}
+
             <Link
-                to="/about"
                 className="[&.active]:font-bold"
+                to="/about"
             >
                 <Button>About</Button>
             </Link>
         </div>
+
         <hr />
+
         <Outlet />
+
         <TanStackRouterDevtools />
     </>
 );
