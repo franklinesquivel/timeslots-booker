@@ -1,5 +1,6 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { GoogleCalendarConflictException } from '@api/modules/bookings/exceptions/booking.exceptions';
 import { GoogleCalendarService } from '@api/modules/google/google-calendar.service';
 import { PrismaService } from '@api/prisma/prisma.service';
 import { CreateBookingDto } from './zod/booking.zod';
@@ -21,8 +22,7 @@ export class BookingsService {
                 endDateTime.toISOString()
             );
 
-            if (!isAvailable)
-                throw new ConflictException('The selected time slot conflicts with the user Google Calendar data');
+            if (!isAvailable) throw new GoogleCalendarConflictException();
         }
 
         // WIP: Add local validation of bookings conflicts

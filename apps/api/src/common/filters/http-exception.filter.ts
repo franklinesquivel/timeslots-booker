@@ -14,9 +14,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const message = getMessageFromUnknownError(exception);
         const context = exception instanceof HttpException ? exception.cause : undefined;
 
+        // Custom error code handler -- Will be present in some HttpException cases
+        let errorCode: string | undefined;
+
+        if (exception instanceof HttpException) {
+            const exceptionResponse = exception.getResponse();
+
+            if (
+                typeof exceptionResponse === 'object' &&
+                'errorCode' in exceptionResponse &&
+                typeof exceptionResponse.errorCode === 'string'
+            ) {
+                errorCode = exceptionResponse.errorCode;
+            }
+        }
+
         response.status(status).json({
             trace: response.getHeader('x-trace-id') ?? null,
             status,
+            ...(errorCode && { code: errorCode }), // add code to payload if present
             reason,
             message,
             timestamp: new Date().toISOString(),
