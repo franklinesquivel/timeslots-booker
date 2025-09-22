@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { TimeSlotBooking, User } from '@prisma/client';
 import {
     GoogleCalendarConflictException,
     LocalBookingConflictException
@@ -15,7 +15,7 @@ export class BookingsService {
         private readonly prismaService: PrismaService
     ) {}
 
-    async create(actor: User, createBookingDto: CreateBookingDto) {
+    async create(actor: User, createBookingDto: CreateBookingDto): Promise<TimeSlotBooking> {
         const { endDateTime, startDateTime } = createBookingDto;
 
         const conflictingBooking = await this.prismaService.timeSlotBooking.findFirst({

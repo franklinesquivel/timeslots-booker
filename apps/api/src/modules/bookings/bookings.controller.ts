@@ -1,14 +1,6 @@
-import {
-    BadRequestException,
-    Body,
-    Controller,
-    Get,
-    NotImplementedException,
-    Param,
-    Post,
-    Req,
-    UseGuards
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { TimeSlotBooking } from '@prisma/client';
+import { ZodValidationPipe } from '@api/common/pipes/zod-validation.pipe';
 import type { AuthenticatedRequest } from '@api/types/express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { BookingsService } from './bookings.service';
@@ -21,18 +13,11 @@ export class BookingsController {
     constructor(private readonly bookingsService: BookingsService) {}
 
     @Post()
-    async create(@Req() req: AuthenticatedRequest, @Body() createBookingDto: CreateBookingDto) {
-        const validation = CreateBookingSchema.safeParse(createBookingDto);
-
-        if (!validation.success) {
-            throw new BadRequestException('Invalid payload', {
-                cause: {
-                    errors: validation.error.issues
-                }
-            });
-        }
-
-        return await this.bookingsService.create(req.user, validation.data);
+    async create(
+        @Req() req: AuthenticatedRequest,
+        @Body(new ZodValidationPipe(CreateBookingSchema)) createBookingDto: CreateBookingDto
+    ): Promise<TimeSlotBooking> {
+        return await this.bookingsService.create(req.user, createBookingDto);
     }
 
     @Get()
