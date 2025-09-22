@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { TimeSlotBooking, User } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { BookingStatus, TimeSlotBooking, User } from '@prisma/client';
 import {
     GoogleCalendarConflictException,
     LocalBookingConflictException
@@ -54,5 +54,29 @@ export class BookingsService {
         return this.prismaService.timeSlotBooking.create({
             data: { ...createBookingDto, userId: actor.id }
         });
+    }
+
+    getUserBookings(actor: User): Promise<TimeSlotBooking[]> {
+        return this.prismaService.timeSlotBooking.findMany({
+            where: { userId: actor.id }
+        });
+    }
+
+    async cancelBooking(actor: User, bookingId: string): Promise<void> {
+        const result = await this.prismaService.timeSlotBooking.updateMany({
+            where: {
+                id: bookingId,
+                status: BookingStatus.ACTIVE, // Only active bookings
+                userId: actor.id // Check for ownership directly in the where clause
+            },
+            data: {
+                status: BookingStatus.CANCELLED
+            }
+        });
+
+        // If no rows were updated, it means the booking was not found for this user.
+        if (result.count === 0) {
+            throw new NotFoundException("Booking not found or you don't have permission to cancel it.");
+        }
     }
 }

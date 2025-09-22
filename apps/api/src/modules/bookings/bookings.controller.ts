@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { TimeSlotBooking } from '@prisma/client';
 import { ZodValidationPipe } from '@api/common/pipes/zod-validation.pipe';
 import type { AuthenticatedRequest } from '@api/types/express';
@@ -13,6 +13,7 @@ export class BookingsController {
     constructor(private readonly bookingsService: BookingsService) {}
 
     @Post()
+    @HttpCode(HttpStatus.CREATED)
     async create(
         @Req() req: AuthenticatedRequest,
         @Body(new ZodValidationPipe(CreateBookingSchema)) createBookingDto: CreateBookingDto
@@ -21,12 +22,14 @@ export class BookingsController {
     }
 
     @Get()
-    findAll(@Req() _req: AuthenticatedRequest) {
-        throw new NotImplementedException();
+    @HttpCode(HttpStatus.OK)
+    findAll(@Req() req: AuthenticatedRequest): Promise<TimeSlotBooking[]> {
+        return this.bookingsService.getUserBookings(req.user);
     }
 
     @Post(':id/cancel')
-    cancel(@Req() _req: AuthenticatedRequest, @Param('id') _id: string) {
-        throw new NotImplementedException();
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async cancel(@Req() req: AuthenticatedRequest, @Param('id') id: string): Promise<void> {
+        await this.bookingsService.cancelBooking(req.user, id);
     }
 }
