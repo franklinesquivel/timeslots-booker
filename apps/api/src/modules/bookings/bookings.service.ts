@@ -6,7 +6,7 @@ import {
 } from '@api/modules/bookings/exceptions/booking.exceptions';
 import { GoogleCalendarService } from '@api/modules/google/google-calendar.service';
 import { PrismaService } from '@api/prisma/prisma.service';
-import { CreateBookingDto } from './zod/booking.zod';
+import { BookingResponseDto, CreateBookingDto } from './zod/booking.zod';
 
 @Injectable()
 export class BookingsService {
@@ -15,7 +15,17 @@ export class BookingsService {
         private readonly prismaService: PrismaService
     ) {}
 
-    async create(actor: User, createBookingDto: CreateBookingDto): Promise<TimeSlotBooking> {
+    private mapToResponseDto(booking: TimeSlotBooking): BookingResponseDto {
+        return {
+            id: booking.id,
+            name: booking.name,
+            startDateTime: booking.startDateTime,
+            endDateTime: booking.endDateTime,
+            status: booking.status
+        };
+    }
+
+    async create(actor: User, createBookingDto: CreateBookingDto): Promise<BookingResponseDto> {
         const { endDateTime, startDateTime } = createBookingDto;
 
         const conflictingBooking = await this.prismaService.timeSlotBooking.findFirst({
@@ -51,15 +61,19 @@ export class BookingsService {
             if (!isAvailable) throw new GoogleCalendarConflictException();
         }
 
-        return this.prismaService.timeSlotBooking.create({
+        const createdBooking = await this.prismaService.timeSlotBooking.create({
             data: { ...createBookingDto, userId: actor.id }
         });
+
+        return this.mapToResponseDto(createdBooking);
     }
 
-    getUserBookings(actor: User): Promise<TimeSlotBooking[]> {
-        return this.prismaService.timeSlotBooking.findMany({
+    async getUserBookings(actor: User): Promise<BookingResponseDto[]> {
+        const bookings = await this.prismaService.timeSlotBooking.findMany({
             where: { userId: actor.id }
         });
+
+        return bookings.map(b => this.mapToResponseDto(b));
     }
 
     async cancelBooking(actor: User, bookingId: string): Promise<void> {

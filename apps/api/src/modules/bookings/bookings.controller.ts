@@ -1,11 +1,9 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { TimeSlotBooking } from '@prisma/client';
 import { ZodValidationPipe } from '@api/common/pipes/zod-validation.pipe';
 import type { AuthenticatedRequest } from '@api/types/express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { BookingsService } from './bookings.service';
-import type { CreateBookingDto } from './zod/booking.zod';
-import { CreateBookingSchema } from './zod/booking.zod';
+import { BookingResponseDto, type CreateBookingDto, CreateBookingSchema } from './zod/booking.zod';
 
 @UseGuards(JwtAuthGuard)
 @Controller('bookings')
@@ -17,13 +15,13 @@ export class BookingsController {
     async create(
         @Req() req: AuthenticatedRequest,
         @Body(new ZodValidationPipe(CreateBookingSchema)) createBookingDto: CreateBookingDto
-    ): Promise<TimeSlotBooking> {
+    ): Promise<BookingResponseDto> {
         return await this.bookingsService.create(req.user, createBookingDto);
     }
 
     @Get()
     @HttpCode(HttpStatus.OK)
-    findAll(@Req() req: AuthenticatedRequest): Promise<TimeSlotBooking[]> {
+    findAll(@Req() req: AuthenticatedRequest): Promise<BookingResponseDto[]> {
         return this.bookingsService.getUserBookings(req.user);
     }
 
