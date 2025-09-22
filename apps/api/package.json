@@ -1,8 +1,11 @@
 {
-    "name": "api",
-    "version": "0.0.1",
-    "description": "",
-    "author": "",
+    "name": "timeslots-booker-api",
+    "version": "1.0.0",
+    "description": "Backend API for a time slot booking application with Google Calendar integration.",
+    "author": {
+        "name": "Franklin Esquivel",
+        "email": "franklin.esquivel@outlook.com"
+    },
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
