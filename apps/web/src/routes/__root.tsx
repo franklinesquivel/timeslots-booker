@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Link, Outlet, createRootRoute, redirect } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { LoginButton } from '@web/components/auth/LoginButton.tsx';
@@ -17,7 +18,7 @@ const RootLayout = () => {
     }
 
     return (
-        <>
+        <div className="container m-auto mt-5">
             <div className="flex items-center justify-between gap-2 p-2">
                 <div className="flex gap-2">
                     <Link
@@ -47,10 +48,13 @@ const RootLayout = () => {
 
             <hr />
 
-            <Outlet />
+            <div className="mt-5">
+                <Outlet />
+            </div>
 
             <TanStackRouterDevtools />
-        </>
+            <ReactQueryDevtools />
+        </div>
     );
 };
 
@@ -61,7 +65,6 @@ export const Route = createRootRoute({
         const publicRoutes: AppRoutes[] = ['/', '/auth/callback'];
 
         if (!isAuthenticated() && !(publicRoutes as string[]).includes(location.pathname)) {
-            // eslint-disable-next-line @typescript-eslint/only-throw-error -- tanstack router uses this pattern for redirects
             throw redirect({ to: '/' });
         }
     }

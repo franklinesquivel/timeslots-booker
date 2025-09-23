@@ -117,5 +117,13 @@ export default defineConfig([
         rules: {
             'react-refresh/only-export-components': 'off'
         }
+    },
+    {
+        // TanStack Router uses this pattern for redirects
+        files: ['src/routes/**/*.tsx'],
+        rules: {
+            'no-throw-literal': 'off',
+            '@typescript-eslint/only-throw-error': 'off'
+        }
     }
 ]);

@@ -10,7 +10,7 @@
     "cssVariables": true,
     "prefix": ""
   },
-  "iconLibrary": "simple-icons",
+  "iconLibrary": "react-feather",
   "aliases": {
     "components": "@web/components",
     "utils": "@web/lib/utils",

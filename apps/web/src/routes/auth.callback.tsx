@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { authStore } from '../stores/auth.store';
 
 const authCallbackSearchSchema = z.object({
-    token: z.string()
+    token: z.string().optional() // It should be required but for router behavior purposes we have to skip the required validation
 });
 
 export const Route = createFileRoute('/auth/callback')({
@@ -13,10 +13,11 @@ export const Route = createFileRoute('/auth/callback')({
     beforeLoad: ({ search }) => {
         if (search.token) {
             authStore.getState().setToken(search.token);
-
-            //eslint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router uses this pattern for redirects
-            throw redirect({ to: '/' });
+        } else {
+            authStore.getState().setError('Authentication failed. Please try again.');
         }
+
+        throw redirect({ to: '/' });
     }
 });
 
