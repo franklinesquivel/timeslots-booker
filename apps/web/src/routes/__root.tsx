@@ -1,0 +1,34 @@
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Outlet, createRootRoute, redirect } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Toaster } from '@web/components/ui/sonner.tsx';
+import { useGetUserProfile } from '@web/hooks/useGetUserProfile.ts';
+import { authStore } from '@web/stores/auth.store.ts';
+import type { AppRoutes } from '@web/types/routes.ts';
+
+const RootLayout = () => {
+    useGetUserProfile();
+
+    return (
+        <div className="flex h-screen w-screen items-center justify-center">
+            <Outlet />
+
+            <Toaster position="top-center" />
+
+            <TanStackRouterDevtools />
+            <ReactQueryDevtools />
+        </div>
+    );
+};
+
+export const Route = createRootRoute({
+    component: RootLayout,
+    beforeLoad: ({ location }) => {
+        const { isAuthenticated } = authStore.getState();
+        const publicRoutes: AppRoutes[] = ['/login', '/auth/callback'];
+
+        if (!isAuthenticated() && !(publicRoutes as string[]).includes(location.pathname)) {
+            throw redirect({ to: '/login' });
+        }
+    }
+});

@@ -1,6 +1,7 @@
 import z from 'zod';
 
 export const schema = z.object({
+    CLIENT_CALLBACK_URL: z.url(),
     DATABASE_URL: z.url(),
     ENABLE_DATABASE_DEBUG_LOGGING: z
         .enum(['true', 'false'])
