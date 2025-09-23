@@ -17,7 +17,7 @@ export const Route = createFileRoute('/auth/callback')({
             authStore.getState().setError('Authentication failed. Please try again.');
         }
 
-        throw redirect({ to: '/' });
+        throw redirect({ to: '/login' });
     }
 });
 
