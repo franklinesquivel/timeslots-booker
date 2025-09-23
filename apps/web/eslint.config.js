@@ -92,6 +92,14 @@ export default defineConfig([
                     component: true,
                     html: true
                 }
+            ],
+
+            'better-tailwindcss/enforce-consistent-line-wrapping': [
+                'error',
+                {
+                    printWidth: 120,
+                    indent: 4
+                }
             ]
         },
         settings: {
