@@ -16,7 +16,7 @@ function Login() {
     return (
         <div
             className={`
-                min-h-60 w-4/5 rounded-2xl bg-white p-5 shadow-2xl
+                min-h-60 w-4/5 rounded-2xl bg-background p-5 shadow-2xl
                 md:w-1/2 md:p-10
             `}
         >

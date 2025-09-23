@@ -1,15 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:opsz@18..144&family=Montserrat&family=Source+Code+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
 
 body {
     /*opacity: 0.8;*/
-    background-image: radial-gradient(var(--primary) 0.7000000000000001px, var(--background) 0.7000000000000001px);
+    background-image: radial-gradient(var(--primary) 0.7000000000000001px, var(--foreground) 0.7000000000000001px);
     background-size: 14px 14px;
 }
 
 :root {
+    --font-sans: JetBrains Mono, ui-monospace, monospace;
+    --font-serif: IBM Plex Serif, ui-serif, serif;
+    --font-mono: JetBrains Mono, ui-monospace, monospace;
     --background: oklch(0.9711 0.0074 80.7211);
     --foreground: oklch(0.3000 0.0358 30.2042);
     --card: oklch(0.9711 0.0074 80.7211);
@@ -42,9 +45,6 @@ body {
     --sidebar-accent-foreground: oklch(0.4254 0.1159 144.3078);
     --sidebar-border: oklch(0.8805 0.0208 74.6428);
     --sidebar-ring: oklch(0.5234 0.1347 144.1672);
-    --font-sans: Montserrat, sans-serif;
-    --font-serif: Merriweather, serif;
-    --font-mono: Source Code Pro, monospace;
     --radius: 0.5rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);

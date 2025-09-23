@@ -19,10 +19,15 @@ export const UserNavBar = ({ user }: Props) => {
     };
 
     return (
-        <div className="flex justify-between">
+        <div
+            className={`
+                flex flex-col justify-between gap-6
+                md:flex-row md:gap-0
+            `}
+        >
             <UserCard user={user} />
 
-            <div className="flex items-center gap-4">
+            <div className={`flex items-center gap-4`}>
                 {!user.allowedGoogleCalendarAccess && (
                     <Button
                         className="rounded-full"

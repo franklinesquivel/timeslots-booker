@@ -3,8 +3,18 @@ import type { User } from '@web/types/user.ts';
 
 export const UserCard = ({ user }: { readonly user: User }) => {
     return (
-        <div className="flex items-center justify-center gap-4">
-            <Avatar>
+        <div
+            className={`
+                flex items-center justify-start gap-4
+                md:justify-center
+            `}
+        >
+            <Avatar
+                className={`
+                    hidden
+                    md:block
+                `}
+            >
                 <AvatarImage src={user.picture} />
                 <AvatarFallback>
                     {user.name
@@ -15,8 +25,22 @@ export const UserCard = ({ user }: { readonly user: User }) => {
             </Avatar>
 
             <div>
-                <p className="font-bold">{user.name}</p>
-                <span className="line-clamp-1 text-xs font-extralight text-gray-600">{user.email}</span>
+                <p
+                    className={`
+                        font-bold
+                        dark:text-primary
+                    `}
+                >
+                    {user.name}
+                </p>
+                <span
+                    className={`
+                        line-clamp-1 text-xs font-extralight text-muted
+                        dark:text-muted-foreground
+                    `}
+                >
+                    {user.email}
+                </span>
             </div>
         </div>
     );
