@@ -13,11 +13,11 @@ export const Route = createFileRoute('/auth/callback')({
     beforeLoad: ({ search }) => {
         if (search.token) {
             authStore.getState().setToken(search.token);
+            throw redirect({ to: '/' });
         } else {
             authStore.getState().setError('Authentication failed. Please try again.');
+            throw redirect({ to: '/login' });
         }
-
-        throw redirect({ to: '/login' });
     }
 });
 

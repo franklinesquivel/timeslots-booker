@@ -12,7 +12,7 @@ const buttonVariants = cva(
         aria-invalid:border-destructive aria-invalid:ring-destructive/20
         dark:aria-invalid:ring-destructive/40
         [&_svg]:pointer-events-none [&_svg]:shrink-0
-        [&_svg:not([class*='size-'])]:size-4
+        [&_svg:not([class*='size-'])]:size-4 cursor-pointer
     `,
     {
         variants: {

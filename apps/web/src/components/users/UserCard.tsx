@@ -3,9 +3,7 @@ import type { User } from '@web/types/user.ts';
 
 export const UserCard = ({ user }: { readonly user: User }) => {
     return (
-        <div>
-            <div>{user.name}</div>
-
+        <div className="flex items-center justify-center gap-4">
             <Avatar>
                 <AvatarImage src={user.picture} />
                 <AvatarFallback>
@@ -15,6 +13,11 @@ export const UserCard = ({ user }: { readonly user: User }) => {
                         .join('')}
                 </AvatarFallback>
             </Avatar>
+
+            <div>
+                <p className="font-bold">{user.name}</p>
+                <span className="line-clamp-1 text-xs font-extralight text-gray-600">{user.email}</span>
+            </div>
         </div>
     );
 };
