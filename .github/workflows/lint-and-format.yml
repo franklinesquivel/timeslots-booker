@@ -1,20 +1,29 @@
 name: Lint and Format Checks
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'apps/api/**'
-      - 'apps/web/**'
   pull_request:
-    branches: [ main ]
-    paths:
-      - 'apps/api/**'
-      - 'apps/web/**'
+    branches: [ develop ]
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+            web:
+              - 'apps/web/**'
+
   check-api:
-    if: "contains(github.event.pull_request.labels.*.name, 'ci:force-api') || contains(toJson(github.event.commits.*.message), '[ci:force-api]') || !contains(github.event.pull_request.labels.*.name, 'ci:skip-api') && !contains(toJson(github.event.commits.*.message), '[ci:skip-api]') && (github.event_name == 'push' || github.event.pull_request.changed_files > 0)"
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -38,7 +47,8 @@ jobs:
         run: yarn format:check
 
   check-web:
-    if: "contains(github.event.pull_request.labels.*.name, 'ci:force-web') || contains(toJson(github.event.commits.*.message), '[ci:force-web]') || !contains(github.event.pull_request.labels.*.name, 'ci:skip-web') && !contains(toJson(github.event.commits.*.message), '[ci:skip-web]') && (github.event_name == 'push' || github.event.pull_request.changed_files > 0)"
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
