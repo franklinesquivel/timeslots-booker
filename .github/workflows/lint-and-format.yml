@@ -1,0 +1,72 @@
+name: Lint and Format Checks
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+            web:
+              - 'apps/web/**'
+
+  check-api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/api
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+          cache-dependency-path: apps/api/yarn.lock
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Linter
+        run: yarn lint
+
+      - name: Run Format Check
+        run: yarn format:check
+
+  check-web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/web
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+          cache-dependency-path: apps/web/yarn.lock
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Linter
+        run: yarn lint
+
+      - name: Run Format Check
+        run: yarn format:check
