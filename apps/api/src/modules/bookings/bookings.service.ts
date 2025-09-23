@@ -70,7 +70,10 @@ export class BookingsService {
 
     async getUserBookings(actor: User): Promise<BookingResponseDto[]> {
         const bookings = await this.prismaService.timeSlotBooking.findMany({
-            where: { userId: actor.id }
+            where: { userId: actor.id },
+            orderBy: {
+                status: 'asc'
+            }
         });
 
         return bookings.map(b => this.mapToResponseDto(b));
