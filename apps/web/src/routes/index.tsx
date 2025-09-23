@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PlusCircle } from 'react-feather';
 import { BookingsTable } from '@web/components/bookings/BookingsTable.tsx';
-import { Button } from '@web/components/ui/button.tsx';
+import { CreateBookingDialog } from '@web/components/bookings/components/CreateBookingDialog.tsx';
 import { UserNavBar } from '@web/components/users/UserNavBar.tsx';
 import { useGetUserBookings } from '@web/hooks/useGetUserBookings.ts';
 import { authStore } from '@web/stores/auth.store.ts';
@@ -25,10 +24,9 @@ function Index() {
 
             <hr className="my-5 h-px border-0 bg-accent" />
 
-            <Button size="lg">
-                <PlusCircle />
-                New Booking
-            </Button>
+            <div className="flex items-center gap-4">
+                <CreateBookingDialog />
+            </div>
 
             {bookingsLoading && <p>Loading...</p>}
 

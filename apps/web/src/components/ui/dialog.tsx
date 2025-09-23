@@ -1,4 +1,5 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { type VariantProps, cva } from 'class-variance-authority';
 import * as React from 'react';
 import { X } from 'react-feather';
 import { cn } from '@web/lib/utils';
@@ -56,29 +57,43 @@ function DialogOverlay({ className, ...props }: React.ComponentProps<typeof Dial
     );
 }
 
+const dialogContentVariants = cva(
+    `
+        fixed top-[50%] left-[50%] z-50 min-h-1/2 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%]
+        gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200
+        data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95
+        data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95
+    `,
+    {
+        variants: {
+            size: {
+                default: 'sm:max-w-lg',
+                lg: 'sm:max-w-2xl',
+                xl: 'sm:max-w-4xl'
+            }
+        },
+        defaultVariants: {
+            size: 'default'
+        }
+    }
+);
+
 function DialogContent({
     className,
     children,
     showCloseButton = true,
+    size,
     ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-    readonly showCloseButton?: boolean;
-}) {
+}: React.ComponentProps<typeof DialogPrimitive.Content> &
+    VariantProps<typeof dialogContentVariants> & {
+        readonly showCloseButton?: boolean;
+    }) {
     return (
         <DialogPortal data-slot="dialog-portal">
             <DialogOverlay />
             <DialogPrimitive.Content
+                className={cn(dialogContentVariants({ size }), className)}
                 data-slot="dialog-content"
-                className={cn(
-                    `
-                        fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%]
-                        translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200
-                        data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95
-                        data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95
-                        sm:max-w-lg
-                    `,
-                    className
-                )}
                 {...props}
             >
                 {children}
