@@ -16,13 +16,13 @@ function Index() {
     return (
         <div
             className={`
-                h-full w-full bg-background p-5 shadow-2xl
+                h-full w-full border border-accent-foreground bg-background p-5 shadow-2xl
                 md:aspect-[3/2] md:h-auto md:w-4/6 md:rounded-2xl md:p-10
             `}
         >
             {user && <UserNavBar user={user} />}
 
-            <hr className="my-5 h-px border-0 bg-accent" />
+            <hr className="my-5 h-1 border-0 bg-accent" />
 
             <div className="flex items-center gap-4">
                 <CreateBookingDialog />
