@@ -32,7 +32,7 @@ export const CreateBookingDialog = () => {
                 </DialogHeader>
                 <CreateBookingForm
                     onSuccess={() => {
-                        // setIsOpen(false);
+                        setIsOpen(false);
                     }}
                 />
             </DialogContent>

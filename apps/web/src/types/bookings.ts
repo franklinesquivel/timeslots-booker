@@ -5,3 +5,5 @@ export interface Booking {
     endDateTime: string;
     status: 'ACTIVE' | 'CANCELLED';
 }
+
+export type CreateBookingPayload = Pick<Booking, 'name' | 'startDateTime' | 'endDateTime'>;

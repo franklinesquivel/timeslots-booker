@@ -1,6 +1,7 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Outlet, createRootRoute, redirect } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Toaster } from '@web/components/ui/sonner.tsx';
 import { useGetUserProfile } from '@web/hooks/useGetUserProfile.ts';
 import { authStore } from '@web/stores/auth.store.ts';
 import type { AppRoutes } from '@web/types/routes.ts';
@@ -11,6 +12,8 @@ const RootLayout = () => {
     return (
         <div className="flex h-screen w-screen items-center justify-center">
             <Outlet />
+
+            <Toaster position="top-center" />
 
             <TanStackRouterDevtools />
             <ReactQueryDevtools />

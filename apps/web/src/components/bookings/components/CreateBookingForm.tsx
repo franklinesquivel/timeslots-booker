@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@web/components/ui/button';
 import { Input } from '@web/components/ui/input';
 import { Label } from '@web/components/ui/label';
+import { useCreateBookingMutation } from '@web/hooks/useCreateBookingMutation';
 import { type CreateBookingSchema, createBookingSchema } from '@web/lib/validators/createBookingSchema';
 import type { CreateBookingPayload } from '@web/types/bookings';
 
@@ -12,10 +13,11 @@ interface Props {
 }
 
 export const CreateBookingForm = ({ onSuccess }: Props) => {
+    const { mutate: createBooking, isPending } = useCreateBookingMutation({ onSuccess });
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, isValid }
+        formState: { errors, isValid }
     } = useForm<CreateBookingSchema>({
         resolver: zodResolver(createBookingSchema),
         mode: 'onChange',
@@ -33,8 +35,7 @@ export const CreateBookingForm = ({ onSuccess }: Props) => {
             endDateTime: dayjs(value.endDateTime).toISOString()
         };
 
-        console.log('Form Payload:', payload);
-        onSuccess();
+        createBooking(payload);
     };
 
     return (
@@ -73,10 +74,10 @@ export const CreateBookingForm = ({ onSuccess }: Props) => {
             </div>
 
             <Button
-                disabled={!isValid || isSubmitting}
+                disabled={!isValid || isPending}
                 type="submit"
             >
-                {isSubmitting ? 'Creating...' : 'Create Booking'}
+                {isPending ? 'Creating...' : 'Create Booking'}
             </Button>
         </form>
     );

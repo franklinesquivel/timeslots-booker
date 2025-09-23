@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { toast } from 'sonner';
 import { BookingsTable } from '@web/components/bookings/BookingsTable.tsx';
 import { CreateBookingDialog } from '@web/components/bookings/components/CreateBookingDialog.tsx';
+import { Button } from '@web/components/ui/button.tsx';
 import { UserNavBar } from '@web/components/users/UserNavBar.tsx';
 import { useGetUserBookings } from '@web/hooks/useGetUserBookings.ts';
 import { authStore } from '@web/stores/auth.store.ts';
@@ -31,7 +33,7 @@ function Index() {
             {bookingsLoading && <p>Loading...</p>}
 
             {!bookingsLoading && (
-                <div className="mt-10">
+                <div className="mt-10 max-h-4/5 overflow-y-scroll">
                     <BookingsTable bookings={bookings} />
                 </div>
             )}

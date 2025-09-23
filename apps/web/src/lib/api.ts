@@ -2,9 +2,12 @@ import { authStore } from '../stores/auth.store';
 
 export class ApiError extends Error {
     status: number;
-    constructor(status: number, message: string) {
+    payload: unknown;
+
+    constructor(status: number, message: string, payload: unknown = null) {
         super(message);
         this.status = status;
+        this.payload = payload;
     }
 }
 
@@ -26,8 +29,17 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
     if (!response.ok) {
         const errorBody = await response.text();
-        const errorMessage = errorBody || response.statusText;
-        throw new ApiError(response.status, errorMessage);
+        let errorPayload: unknown = null;
+        try {
+            errorPayload = JSON.parse(errorBody);
+        } catch (_e) {
+            // The body was not JSON
+        }
+
+        const parsedPayload = errorPayload as { message?: string };
+
+        const errorMessage = parsedPayload.message ?? errorBody;
+        throw new ApiError(response.status, errorMessage, errorPayload);
     }
 
     if (response.status === 204 || response.headers.get('Content-Length') === '0') {
