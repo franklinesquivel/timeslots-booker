@@ -24,6 +24,7 @@ function Login() {
                 className={`
                     text-center text-xl leading-tight font-bold
                     md:text-4xl
+                    dark:text-primary
                 `}
             >
                 Welcome to Timeslots Booker

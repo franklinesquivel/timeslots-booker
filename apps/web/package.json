@@ -1,7 +1,8 @@
 {
     "name": "timeslots-booker-app",
     "private": true,
-    "version": "0.0.0",
+    "version": "1.0.0",
+    "description": "Web client for a time slot booking application with Google Calendar integration.",
     "author": {
         "name": "Franklin Esquivel",
         "email": "franklin.esquivel@outlook.com"
