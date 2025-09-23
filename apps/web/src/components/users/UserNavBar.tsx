@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { LogOut } from 'react-feather';
 import { Button } from '@web/components/ui/button.tsx';
+import { ThemeToggle } from '@web/components/ui/theme-toggle';
 import { authStore } from '@web/stores/auth.store.ts';
 import type { User } from '@web/types/user.ts';
 import { GoogleScopesWarningDialog } from './GoogleScopesWarningDialog.tsx';
@@ -29,6 +30,7 @@ export const UserNavBar = ({ user }: Props) => {
             <UserCard user={user} />
 
             <div className={`flex items-center gap-4`}>
+                <ThemeToggle />
                 {!user.allowedGoogleCalendarAccess && <GoogleScopesWarningDialog />}
 
                 <Button

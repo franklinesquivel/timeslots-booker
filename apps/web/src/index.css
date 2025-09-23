@@ -4,7 +4,6 @@
 @import "tw-animate-css";
 
 body {
-    /*opacity: 0.8;*/
     background-image: radial-gradient(var(--primary) 0.7000000000000001px, var(--foreground) 0.7000000000000001px);
     background-size: 14px 14px;
 }
@@ -95,9 +94,6 @@ body {
     --sidebar-accent-foreground: oklch(0.9423 0.0097 72.6595);
     --sidebar-border: oklch(0.3942 0.0265 142.9926);
     --sidebar-ring: oklch(0.6731 0.1624 144.2083);
-    --font-sans: Montserrat, sans-serif;
-    --font-serif: Merriweather, serif;
-    --font-mono: Source Code Pro, monospace;
     --radius: 0.5rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
