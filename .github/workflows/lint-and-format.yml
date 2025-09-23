@@ -1,0 +1,62 @@
+name: Lint and Format Checks
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/api/**'
+      - 'apps/web/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'apps/api/**'
+      - 'apps/web/**'
+
+jobs:
+  check-api:
+    if: "contains(github.event.pull_request.labels.*.name, 'ci:force-api') || contains(toJson(github.event.commits.*.message), '[ci:force-api]') || !contains(github.event.pull_request.labels.*.name, 'ci:skip-api') && !contains(toJson(github.event.commits.*.message), '[ci:skip-api]') && (github.event_name == 'push' || github.event.pull_request.changed_files > 0)"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/api
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+          cache-dependency-path: apps/api/yarn.lock
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Linter
+        run: yarn lint
+
+      - name: Run Format Check
+        run: yarn format:check
+
+  check-web:
+    if: "contains(github.event.pull_request.labels.*.name, 'ci:force-web') || contains(toJson(github.event.commits.*.message), '[ci:force-web]') || !contains(github.event.pull_request.labels.*.name, 'ci:skip-web') && !contains(toJson(github.event.commits.*.message), '[ci:skip-web]') && (github.event_name == 'push' || github.event.pull_request.changed_files > 0)"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/web
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+          cache-dependency-path: apps/web/yarn.lock
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Linter
+        run: yarn lint
+
+      - name: Run Format Check
+        run: yarn format:check
