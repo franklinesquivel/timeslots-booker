@@ -27,6 +27,10 @@ const buttonVariants = cva(
                     focus-visible:ring-destructive/20
                     dark:bg-destructive/60 dark:focus-visible:ring-destructive/40
                 `,
+                warning: `
+                    bg-warning text-white
+                    hover:bg-warning/90
+                `,
                 outline: `
                     border bg-background shadow-xs
                     hover:bg-accent hover:text-accent-foreground

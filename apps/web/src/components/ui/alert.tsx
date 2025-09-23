@@ -16,6 +16,11 @@ const alertVariants = cva(
                     bg-card text-destructive
                     *:data-[slot=alert-description]:text-destructive/90
                     [&>svg]:text-current
+                `,
+                warning: `
+                    bg-warning text-white
+                    *:data-[slot=alert-description]:text-white/90
+                    [&>svg]:text-current
                 `
             }
         },

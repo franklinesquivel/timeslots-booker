@@ -1,8 +1,9 @@
 import { useNavigate } from '@tanstack/react-router';
-import { Lock, LogOut } from 'react-feather';
+import { LogOut } from 'react-feather';
 import { Button } from '@web/components/ui/button.tsx';
 import { authStore } from '@web/stores/auth.store.ts';
 import type { User } from '@web/types/user.ts';
+import { GoogleScopesWarningDialog } from './GoogleScopesWarningDialog.tsx';
 import { UserCard } from './UserCard.tsx';
 
 interface Props {
@@ -28,15 +29,7 @@ export const UserNavBar = ({ user }: Props) => {
             <UserCard user={user} />
 
             <div className={`flex items-center gap-4`}>
-                {!user.allowedGoogleCalendarAccess && (
-                    <Button
-                        className="rounded-full"
-                        size="icon"
-                        variant="ghost"
-                    >
-                        <Lock />
-                    </Button>
-                )}
+                {!user.allowedGoogleCalendarAccess && <GoogleScopesWarningDialog />}
 
                 <Button
                     variant="secondary"
