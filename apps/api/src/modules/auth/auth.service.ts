@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { User } from '@prisma/client';
 import { googleCalendarScopes } from '@api/common/constants/google-calendar-scopes';
+import { TypedConfigService } from '@api/config/typed-config.service';
 import { GoogleAuthService } from '@api/modules/google/google-auth.service';
 import { PrismaService } from '@api/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
     constructor(
+        private readonly configService: TypedConfigService,
         private readonly googleAuthService: GoogleAuthService,
         private readonly jwtService: JwtService,
         private readonly prisma: PrismaService
@@ -68,17 +70,19 @@ export class AuthService {
          * This ensures the `allowedGoogleCalendarAccess` flag in the database
          * accurately reflects the permissions granted by the user.
          */
-        return await this.prisma.user.update({
+        return this.prisma.user.update({
             where: { id: user.id },
             data: { allowedGoogleCalendarAccess: calendarScopesAreEnabled }
         });
     }
 
-    login(user: User) {
+    getUserAccessToken(user: User): string {
         const payload = { email: user.email, sub: user.id };
 
-        return {
-            accessToken: this.jwtService.sign(payload)
-        };
+        return this.jwtService.sign(payload);
+    }
+
+    getClientCallbackUrl(): string {
+        return this.configService.get('CLIENT_CALLBACK_URL');
     }
 }

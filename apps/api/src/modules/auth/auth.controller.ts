@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Redirect, Req, UseGuards } from '@nestjs/common';
 import type { AuthenticatedRequest } from '@api/types/express';
 import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './google-auth.guard';
@@ -16,8 +16,13 @@ export class AuthController {
 
     @Get('google/callback')
     @UseGuards(GoogleAuthGuard)
+    @Redirect()
     googleAuthRedirect(@Req() req: AuthenticatedRequest) {
-        return this.authService.login(req.user);
+        const accessToken = this.authService.getUserAccessToken(req.user);
+
+        return {
+            url: `${this.authService.getClientCallbackUrl()}?token=${accessToken}`
+        };
     }
 
     @Get('profile')
